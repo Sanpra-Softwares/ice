@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger UI</title>
+    <!-- Link to Swagger UI CSS file -->
+    <link rel="stylesheet" href="/assets/mobile/swagger/swagger-ui.css">
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Div for Swagger UI to render -->
+    <div id="swagger-ui"></div>
+
+    <!-- Swagger UI JavaScript files -->
+    <script src="/assets/mobile/swagger/swagger-ui-bundle.js"></script>
+    <script src="/assets/mobile/swagger/swagger-ui-standalone-preset.js"></script>
+
+    <script>
+        // On window load, initialize Swagger UI
+        window.onload = function() {
+            try {
+                const ui = SwaggerUIBundle({
+                    url: "/api/method/mobile.mobile_env.swagger.get_swagger_json", // Frappe endpoint for Swagger JSON
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,  // Allows deep linking to API sections
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl  // Allows users to download the JSON file
+                    ],
+                    layout: "StandaloneLayout"  // Custom layout for standalone use
+                });
+
+                window.ui = ui;  // Expose Swagger UI instance for debugging if needed
+                console.log("Swagger UI successfully loaded.");
+            } catch (error) {
+                console.error("Error initializing Swagger UI:", error);
+                alert("Error loading Swagger UI. Please check your setup.");
+            }
+        };
+    </script>
+</body>
+</html>
