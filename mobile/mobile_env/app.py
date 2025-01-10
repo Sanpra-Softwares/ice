@@ -156,13 +156,13 @@ def get_dashboard():
         log_details = get_last_log_details(emp_data.get("name"))
         a,b=get_leave_balance_dashboard()
         current_site=frappe.local.site
-        permissionlist=user_has_permission()
+        # permissionlist=user_has_permission()
         dashboard_data = {
            "leave_balance": b,
             # "latest_leave": {},
             # "latest_expense": {},
             # "latest_salary_slip": {},
-            "permission_list":permissionlist,
+            # "permission_list":permissionlist,
             "last_log_type": log_details.get("log_type"),
            "attendance_details":attendance_details,
             "emp_name":emp_data.get("employee_name"),
@@ -398,7 +398,7 @@ def get_data_from_notes(doc_name):
 
 
 @frappe.whitelist()
-def create_employee_log(log_type, location=None):
+def create_employee_log(log_type, latitude=None,longitude=None):
     try:
         emp_data = get_employee_by_user(
             frappe.session.user, fields=["name", "default_shift"]
@@ -409,7 +409,8 @@ def create_employee_log(log_type, location=None):
                 employee=emp_data.get("name"),
                 log_type=log_type,
                 time=now_datetime().__str__()[:-7],
-                custom_location=location,
+                latitude=latitude,
+                longitude=longitude
             )
         ).insert(ignore_permissions=True)
         update_shift_last_sync(emp_data)
