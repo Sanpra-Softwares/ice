@@ -398,7 +398,7 @@ def get_data_from_notes(doc_name):
 
 
 @frappe.whitelist()
-def create_employee_log(log_type, latitude=None,longitude=None):
+def create_employee_log(log_type, latitude=None,longitude=None,custom_work_report=None):
     try:
         emp_data = get_employee_by_user(
             frappe.session.user, fields=["name", "default_shift"]
@@ -410,7 +410,8 @@ def create_employee_log(log_type, latitude=None,longitude=None):
                 log_type=log_type,
                 time=now_datetime().__str__()[:-7],
                 latitude=latitude,
-                longitude=longitude
+                longitude=longitude,
+                custom_work_report=custom_work_report
             )
         ).insert(ignore_permissions=True)
         update_shift_last_sync(emp_data)

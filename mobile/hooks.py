@@ -185,9 +185,9 @@ app_license = "MIT"
 # auth_hooks = [
 #	"mobile.auth.validate"
 # ]
-website_route_rules = [
-    {"from_route": "/swagger", "to_route": "swagger.html"}
-]
+# website_route_rules = [
+#     {"from_route": "/swagger", "to_route": "swagger.html"}
+# ]
 
 # doc_events = {
 #     "File": {
