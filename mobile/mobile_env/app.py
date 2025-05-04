@@ -36,7 +36,7 @@ from mobile.mobile_env.app_utils import (
     get_global_defaults,
     exception_handel,
 )
-
+from datetime import datetime, timedelta
 from erpnext.accounts.utils import get_fiscal_year
 
 
@@ -154,17 +154,41 @@ def get_dashboard():
         emp_data = get_employee_by_user(frappe.session.user, fields=["name", "company","employee_name"])
         attendance_details = get_attendance_details(emp_data)
         log_details = get_last_log_details(emp_data.get("name"))
+        # frappe.msgprint(str(log_details))
         a,b=get_leave_balance_dashboard()
         current_site=frappe.local.site
-        # permissionlist=user_has_permission()
+        start_date = f"{today()} 00:00:00"
+        end_date = f"{today()} 23:59:59"
+        in_time_value = frappe.get_value(
+            "Employee Checkin",
+            {
+                "employee": emp_data.get("name"),
+                "log_type": "IN",
+                "time": ["between", [start_date, end_date]]
+            },
+            "time"
+        )
+
+        in_time = in_time_value.strftime("%d-%b %I:%M%p") if in_time_value else ""
+
+        out_time_value = frappe.get_value(
+            "Employee Checkin",
+            {
+                "employee": emp_data.get("name"),
+                "log_type": "OUT",
+                "time": ["between", [start_date, end_date]]
+            },
+            "time"
+        )
+
+        out_time = out_time_value.strftime("%d-%b %I:%M%p") if out_time_value else ""
+
         dashboard_data = {
            "leave_balance": b,
-            # "latest_leave": {},
-            # "latest_expense": {},
-            # "latest_salary_slip": {},
-            # "permission_list":permissionlist,
+            "in_time":in_time,
+            "out_time":out_time,
             "last_log_type": log_details.get("log_type"),
-           "attendance_details":attendance_details,
+            "attendance_details":attendance_details,
             "emp_name":emp_data.get("employee_name"),
             "email":frappe.session.user,
             "company": emp_data.get("company") or "Employee Dashboard",
@@ -181,7 +205,6 @@ def get_dashboard():
         else:
             dashboard_data["employee_image"] = None
             
-        get_last_log_type(dashboard_data, emp_data.get("name"))
         return gen_response(200, "Dashboard data get successfully", dashboard_data)
 
     except Exception as e:
@@ -212,6 +235,7 @@ def get_emp_name():
     except Exception as e:
         return exception_handel(e)
 
+@frappe.whitelist()
 def get_last_log_details(employee):
     log_details = frappe.db.sql(
         """select log_type,time from `tabEmployee Checkin` where employee=%s and DATE(time)=%s order by time desc""",
@@ -498,16 +522,16 @@ def get_leave_balance_dashboard():
 
 
 
-def get_last_log_type(dashboard_data, employee):
-    logs = frappe.get_all(
-        "Employee Checkin",
-        filters={"employee": employee},
-        fields=["log_type"],
-        order_by="time desc",
-    )
+# def get_last_log_type(dashboard_data, employee):
+#     logs = frappe.get_all(
+#         "Employee Checkin",
+#         filters={"employee": employee},
+#         fields=["log_type"],
+#         order_by="time desc",
+#     )
 
-    if len(logs) >= 1:
-        dashboard_data["last_log_type"] = logs[0].log_type
+#     if len(logs) >= 1:
+#         dashboard_data["last_log_type"] = logs[0].log_type
 
 
 
