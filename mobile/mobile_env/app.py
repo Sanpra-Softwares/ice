@@ -25,6 +25,7 @@ from frappe.utils import (
     fmt_money,
 )
 from frappe.utils.data import nowtime
+from frappe.defaults import get_user_default
 from mobile.mobile_env.app_utils import (
     gen_response,
     generate_key,
@@ -920,6 +921,33 @@ def get_attendance_details_dashboard():
         )
     except Exception as e:
         return exception_handel(e)
+
+
+@frappe.whitelist()
+def get_sales_person_dashboard():
+    try:
+        global_defaults = get_global_defaults()
+        company = global_defaults.get("default_company")
+        fiscal_year = get_fiscal_year(nowdate())[0]
+        filters = {
+            "company": company,
+            "fiscal_year": fiscal_year,
+            "doctype": "Sales Invoice",
+            "period": "Yearly",
+            "target_on": "Amount",
+        }
+        from frappe.desk.query_report import run
+
+        attendance_report = run("Sales Person Target Variance Based On Item Group", filters=filters)
+        frappe.msgprint(str(attendance_report))
+
+        # Ensure result is always defined
+        result = attendance_report.get("result") if attendance_report.get("result") else []
+
+        return gen_response(200, "Sales Person data get successfully", result)
+    except Exception as e:
+        return exception_handel(e)
+
 
 
 def get_attendance_details(emp_data):
