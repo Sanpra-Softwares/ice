@@ -1012,6 +1012,7 @@ def get_attendance_details(emp_data):
 @frappe.whitelist()
 def run_attendance_report(employee, company):
     filters = {
+        "filter_based_on":"Month",
         "month": cstr(frappe.utils.getdate().month),
         "year": cstr(frappe.utils.getdate().year),
         "company": company,
